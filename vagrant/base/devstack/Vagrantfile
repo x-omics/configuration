@@ -3,6 +3,8 @@ VAGRANTFILE_API_VERSION = "2"
 MEMORY = 2048
 CPU_COUNT = 2
 
+Vagrant.require_version ">= 1.4.3"
+
 edx_platform_mount_dir = "edx-platform"
 forum_mount_dir = "cs_comments_service"
 ora_mount_dir = "ora"

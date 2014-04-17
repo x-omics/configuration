@@ -3,6 +3,8 @@ VAGRANTFILE_API_VERSION = "2"
 MEMORY = 2048
 CPU_COUNT = 2
 
+Vagrant.require_version ">= 1.4.3"
+
 $script = <<SCRIPT
 if [ ! -d /edx/app/edx_ansible ]; then
     echo "Error: Base box is missing provisioning scripts." 1>&2
