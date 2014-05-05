@@ -37,7 +37,7 @@
 
 - name: Creating common nginx configuration
   template: >
-    src=edx/app/nginx/sites-available/edx-release.j2
+    src={{ nginx_template_directory }}/edx-release.j2
     dest={{ nginx_sites_available_dir }}/edx-release
     owner=root group=root mode=0600
   notify: reload nginx
@@ -58,7 +58,7 @@
 
 - name: Copying nginx configs for {{ nginx_sites }}
   template: >
-    src=edx/app/nginx/sites-available/{{ item }}.j2
+    src={{ nginx_template_directory }}/{{ item }}.j2
     dest={{ nginx_sites_available_dir }}/{{ item }}
     owner=root group={{ common_web_user }} mode=0640
   notify: reload nginx
