@@ -80,20 +80,20 @@
         - xqueue
     - datadog
 
-- name: run the certificate agent on the first util machine only
-  hosts: ~tag_Name_util1_prod
-  sudo: True
-  vars:
-    secure_dir: '../../../configuration-secure/ansible'
-    migrate_db: "no"
-  vars_files:
-    - "roles/common/defaults/main.yml"
-    - "roles/supervisor/defaults/main.yml"
-    - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"
-    - "{{ secure_dir }}/vars/certs_prod_vars.yml"
-  roles:
-    - role: certs
-      tags: certs
+#- name: run the certificate agent on the first util machine only
+#  hosts: ~tag_Name_util1_prod
+#  sudo: True
+#  vars:
+#    secure_dir: '../../../configuration-secure/ansible'
+#    migrate_db: "no"
+#  vars_files:
+#    - "roles/common/defaults/main.yml"
+#    - "roles/supervisor/defaults/main.yml"
+#    - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"
+#    - "{{ secure_dir }}/vars/certs_prod_vars.yml"
+#  roles:
+#    - role: certs
+#      tags: certs
 
 - name: run the notifier on the second util machine only
   hosts: ~tag_Name_util2_prod

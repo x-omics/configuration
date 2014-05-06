@@ -16,51 +16,12 @@
     - "{{ secure_dir }}/vars/edxapp_stage_vars.yml"
     - "{{ secure_dir }}/vars/xqueue_stage_vars.yml"
     #- "{{ secure_dir }}/vars/users.yml"
-    #- "{{ secure_dir }}/vars/edxapp_stage_users.yml"
+    - "{{ secure_dir }}/vars/edxapp_stage_users.yml"
     - "{{ secure_dir }}/vars/datadog_stage.yml"
   roles:
     - role: common
     - role: supervisor
     - role: user
-      USER_INFO:
-        - name: sefk
-          github: true
-          type: admin
-        - name: jbau
-          github: true
-          type: admin
-        - name: jrbl
-          github: true
-          type: admin
-        - name: ali123
-          github: true
-          type: admin
-        - name: caesar2164
-          github: true
-          type: admin
-        - name: dcadams
-          github: true
-          type: admin
-        - name: nparlante
-          github: true
-          type: admin
-        - name: stvstnfrd
-          github: true
-          type: admin
-        - name: jinpa
-          github: true
-        - name: gbruhns
-          github: true
-        - name: paepcke
-          github: true
-        - name: akshayka
-          github: true
-        - name: halawa
-          github: true
-        - name: amayalah
-          github: true
-        - name: mondiaz
-          github: true
       tags: users
     - role: edxapp
       celery_worker: True
@@ -89,8 +50,6 @@
     - "{{ secure_dir }}/vars/edxapp_stage_vars.yml"
     - "{{ secure_dir }}/vars/certs_stage_vars.yml"
   roles:
-    - role: gh_users # gh_users var intentionally unspecified
-      tags: users 
     - role: certs
       tags: certs
 
