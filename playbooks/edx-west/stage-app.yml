@@ -18,22 +18,7 @@
   roles:
     - common
     - supervisor
-    - role: gh_users
-      gh_users:
-        - sefk
-        - jbau
-        - jrbl
-        - ali123
-        - caesar2164
-        - dcadams
-        - nparlante
-        - stvstnfrd
-        - jarv
-        - e0d
-        - feanil
-      gh_users_no_sudo:
-        - jinpa
-        - gbruhns
+    - role: user
       tags: users
     - role: nginx
       nginx_sites:
@@ -46,7 +31,8 @@
     - role: edxapp
       devstack: false
     - apache
-    - shibboleth
+    - role: shibboleth
+      tags: shib
     #- datadog
     #- splunkforwarder
 

@@ -31,7 +31,13 @@ EDXAPP_MONGO_DB_NAME: 'edxapp'
 
 EDXAPP_MYSQL_DB_NAME: 'edxapp'
 EDXAPP_MYSQL_USER: 'edxapp001'
+EDXAPP_MYSQL_USER_ADMIN: 'root'
+EDXAPP_MYSQL_USER_MIGRATE: 'migrate'
 EDXAPP_MYSQL_PASSWORD: 'password'
+EDXAPP_MYSQL_PASSWORD_READ_ONLY: 'password'
+EDXAPP_MYSQL_PASSWORD_ADMIN: 'password'
+EDXAPP_MYSQL_PASSWORD_MIGRATE: 'password'
+
 EDXAPP_MYSQL_HOST: 'localhost'
 EDXAPP_MYSQL_PORT: '3306'
 
@@ -57,6 +63,14 @@ EDXAPP_CELERY_PASSWORD: 'celery'
 
 EDXAPP_PLATFORM_NAME: 'edX'
 
+EDXAPP_CAS_SERVER_URL: ''
+EDXAPP_CAS_EXTRA_LOGIN_PARAMS: ''
+EDXAPP_CAS_ATTRIBUTE_CALLBACK: ''
+EDXAPP_CAS_ATTRIBUTE_PACKAGE: ''
+# Enable an end-point that creates a user and logs them in
+# Used for performance testing
+EDXAPP_ENABLE_AUTO_AUTH: false
+
 EDXAPP_FEATURES:
   AUTH_USE_OPENID_PROVIDER: true
   CERTIFICATES_ENABLED: true
@@ -67,6 +81,7 @@ EDXAPP_FEATURES:
   PREVIEW_LMS_BASE: $EDXAPP_PREVIEW_LMS_BASE
   ENABLE_S3_GRADE_DOWNLOADS: true
   USE_CUSTOM_THEME: $edxapp_use_custom_theme
+  AUTOMATIC_AUTH_FOR_TESTING: $EDXAPP_ENABLE_AUTO_AUTH
 
 EDXAPP_BOOK_URL: ''
 # This needs to be set to localhost
@@ -104,6 +119,7 @@ EDXAPP_BULK_EMAIL_DEFAULT_FROM_EMAIL: 'no-reply@example.com'
 EDXAPP_ENV_EXTRA: {}
 EDXAPP_AUTH_EXTRA: {}
 EDXAPP_MKTG_URL_LINK_MAP: {}
+EDXAPP_MKTG_URLS: {}
 # Set this sets the url for static files
 # Override this var to use a CDN
 # Example: xxxxx.cloudfront.net/static/
@@ -113,6 +129,18 @@ EDXAPP_STATIC_URL_BASE: "/static/"
 EDXAPP_GRADE_STORAGE_TYPE: 'localfs'
 EDXAPP_GRADE_BUCKET: 'edx-grades'
 EDXAPP_GRADE_ROOT_PATH: '/tmp/edx-s3/grades'
+# Credit card processor
+# These are the same defaults set in common.py
+EDXAPP_CC_PROCESSOR:
+  CyberSource:
+    SHARED_SECRET: ''
+    MERCHANT_ID: ''
+    SERIAL_NUMBER: ''
+    ORDERPAGE_VERSION: '7'
+    PURCHASE_ENDPOINT: ''
+
+# does not affect verified students
+EDXAPP_PAID_COURSE_REGISTRATION_CURRENCY: ['usd', '$']
 
 # Configure rake tasks in edx-platform to skip Python/Ruby/Node installation
 EDXAPP_NO_PREREQ_INSTALL: 1
@@ -123,23 +151,39 @@ EDXAPP_PYTHON_SANDBOX: false
 # it puts the sandbox in 'complain' mode, for reporting but not enforcement
 EDXAPP_SANDBOX_ENFORCE: true
 
-EDXAPP_USER: 'www-data'
-COMMON_WEB_GROUP: 'www-data'
-# Supply authorized keys used for remote management via the automated
-# role, see meta/main.yml.  Ensure you know what this does before
-# enabling.  The boolean flag determines whether the role is included.
-# This is done to make it possible to disable remote access easily by
-# setting the flag to true and providing an empty array.
-EDXAPP_INCLUDE_AUTOMATOR_ROLE: false
+# Supply authorized keys used for remote management via the user
+# role.
+EDXAPP_AUTOMATOR_NAME: automator
 EDXAPP_AUTOMATOR_AUTHORIZED_KEYS: []
+# These are the commands allowed by the automator role.
+# The --settings parameter must be set at the end so that
+# is caught by the glob.
+# Example: sudo -u www-data /edx/bin/python.edxapp /edx/bin/manage.edxapp lms migrate --settings=aws
+EDXAPP_AUTOMATOR_SUDO_CMDS:
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp lms migrate *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp cms migrate *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp lms syncdb *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp cms syncdb *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp lms seed_permissions_roles *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp lms set_staff *"
+- "ALL=({{ common_web_user }})  NOPASSWD:SETENV:{{ COMMON_BIN_DIR }}/python.edxapp {{ COMMON_BIN_DIR }}/manage.edxapp lms transfer_students *"
 
 EDXAPP_USE_GIT_IDENTITY: false
-# Example: "{{ secure_dir }}/files/git-identity"
-EDXAPP_LOCAL_GIT_IDENTITY: !!null
+# Paste the contents of the git identity
+# into this var
+EDXAPP_GIT_IDENTITY: !!null
 
 # Configuration for database migration
 EDXAPP_TEST_MIGRATE_DB_NAME: "{{ COMMON_ENVIRONMENT }}_{{ COMMON_DEPLOYMENT }}_test_{{ EDXAPP_MYSQL_DB_NAME }}"
 
+EDXAPP_UPDATE_STATIC_FILES_KEY: false
+# Set this to true if you want to install the private pip
+# requirements in the edx-platform repo.
+# This will use EDXAPP_GIT_IDENTITY, EDXAPP_USE_GIT_IDENTITY
+# must be set to true if EDXAPP_INSTALL_PRIVATE_REQUIREMENTS is
+# set to true
+
+EDXAPP_INSTALL_PRIVATE_REQUIREMENTS: false
 #-------- Everything below this line is internal to the role ------------
 
 #Use YAML references (& and *) and hash merge <<: to factor out shared settings
@@ -157,14 +201,14 @@ edxapp_rbenv_shims: "{{ edxapp_rbenv_root }}/shims"
 edxapp_rbenv_bin: "{{ edxapp_rbenv_root }}/bin"
 edxapp_gem_root: "{{ edxapp_rbenv_dir }}/.gem"
 edxapp_gem_bin: "{{ edxapp_gem_root }}/bin"
+edxapp_user: edxapp
 edxapp_deploy_path: "{{ edxapp_venv_bin }}:{{ edxapp_code_dir }}/bin:{{ edxapp_rbenv_bin }}:{{ edxapp_rbenv_shims }}:{{ edxapp_gem_bin }}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 edxapp_staticfile_dir: "{{ edxapp_data_dir }}/staticfiles"
 edxapp_course_data_dir: "{{ edxapp_data_dir }}/data"
 edxapp_upload_dir: "{{ edxapp_data_dir }}/uploads"
 edxapp_theme_dir: "{{ edxapp_data_dir }}/themes"
-edxapp_git_identity: "{{ edxapp_app_dir }}/{{ EDXAPP_LOCAL_GIT_IDENTITY|basename }}"
+edxapp_git_identity: "{{ edxapp_app_dir }}/edxapp-git-identity"
 edxapp_git_ssh: "/tmp/edxapp_git_ssh.sh"
-edxapp_pypi_local_mirror: "http://localhost:{{ devpi_port }}/root/pypi/+simple"
 edxapp_workers:
   - queue: low
     service_variant: cms
@@ -202,6 +246,7 @@ edxapp_chksum_req_files:
   - "{{ pre_requirements_file }}"
   - "{{ post_requirements_file }}"
   - "{{ base_requirements_file }}"
+  - "{{ paver_requirements_file }}"
   - "{{ sandbox_post_requirements }}"
   - "{{ sandbox_base_requirements }}"
 
@@ -210,6 +255,7 @@ edxapp_all_req_files:
   - "{{ pre_requirements_file }}"
   - "{{ post_requirements_file }}"
   - "{{ base_requirements_file }}"
+  - "{{ paver_requirements_file }}"
   - "{{ repo_requirements_file }}"
   - "{{ github_requirements_file }}"
   - "{{ sandbox_post_requirements }}"
@@ -323,6 +369,7 @@ generic_env_config:  &edxapp_generic_env
   FEEDBACK_SUBMISSION_EMAIL: $EDXAPP_FEEDBACK_SUBMISSION_EMAIL
   TIME_ZONE: $EDXAPP_TIME_ZONE
   MKTG_URL_LINK_MAP: $EDXAPP_MKTG_URL_LINK_MAP
+  MKTG_URLS: $EDXAPP_MKTG_URLS
   # repo root for courses
   GITHUB_REPO_ROOT: $edxapp_course_data_dir
   CACHES:
@@ -362,10 +409,13 @@ generic_env_config:  &edxapp_generic_env
   DEFAULT_FEEDBACK_EMAIL: $EDXAPP_DEFAULT_FEEDBACK_EMAIL
   SERVER_EMAIL: $EDXAPP_DEFAULT_SERVER_EMAIL
   BULK_EMAIL_DEFAULT_FROM_EMAIL: $EDXAPP_BULK_EMAIL_DEFAULT_FROM_EMAIL
-
+  CAS_SERVER_URL: $EDXAPP_CAS_SERVER_URL
+  CAS_EXTRA_LOGIN_PARAMS: $EDXAPP_CAS_EXTRA_LOGIN_PARAMS
+  CAS_ATTRIBUTE_CALLBACK: $EDXAPP_CAS_ATTRIBUTE_CALLBACK
 
 lms_auth_config:
   <<: *edxapp_generic_auth
+  CC_PROCESSOR: $EDXAPP_CC_PROCESSOR
   MODULESTORE:
     default:
       ENGINE: 'xmodule.modulestore.mixed.MixedModuleStore'
@@ -393,6 +443,7 @@ lms_auth_config:
 
 lms_env_config:
   <<: *edxapp_generic_env
+  PAID_COURSE_REGISTRATION_CURRENCY: $EDXAPP_PAID_COURSE_REGISTRATION_CURRENCY
   'CODE_JAIL':
     # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     'python_bin': '{% if EDXAPP_PYTHON_SANDBOX %}{{ edxapp_sandbox_venv_dir }}/bin/python{% endif %}'
@@ -440,9 +491,6 @@ service_variants_enabled:
 edxapp_lms_env: 'lms.envs.aws'
 edxapp_cms_env: 'cms.envs.aws'
 
-edxapp_user: '{{ EDXAPP_USER }}'
-common_web_group: '{{ COMMON_WEB_GROUP }}'
-
 #Number of gunicorn worker processes to spawn, as a multiplier to number of virtual cores
 worker_core_mult:
   lms: 4
@@ -469,8 +517,10 @@ local_requirements_file:  "{{ edxapp_code_dir }}/requirements/edx/local.txt"
 pre_requirements_file:    "{{ edxapp_code_dir }}/requirements/edx/pre.txt"
 post_requirements_file:   "{{ edxapp_code_dir }}/requirements/edx/post.txt"
 base_requirements_file:   "{{ edxapp_code_dir }}/requirements/edx/base.txt"
+paver_requirements_file:   "{{ edxapp_code_dir }}/requirements/edx/paver.txt"
 github_requirements_file: "{{ edxapp_code_dir }}/requirements/edx/github.txt"
 repo_requirements_file:   "{{ edxapp_code_dir }}/requirements/edx/repo.txt"
+private_requirements_file:   "{{ edxapp_code_dir }}/requirements/edx/edx-private.txt"
 
 sandbox_base_requirements:  "{{ edxapp_code_dir }}/requirements/edx-sandbox/base.txt"
 sandbox_local_requirements: "{{ edxapp_code_dir }}/requirements/edx-sandbox/local.txt"
@@ -522,10 +572,3 @@ edxapp_cms_variant: cms
 
 # Worker Settings
 worker_django_settings_module: 'aws'
-
-# This array is used by the automator role to provide
-# access to a limited set of commands via rbash.  The
-# commands listed here will be symlinked to ~/bin/ for
-# the automator user.
-edxapp_automated_rbash_links:
-  - /usr/bin/sudo

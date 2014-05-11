@@ -42,7 +42,7 @@ nginx_lms_preview_gunicorn_hosts:
 nginx_cms_gunicorn_hosts:
   - 127.0.0.1
 
-nginx_template_directory: ""
+nginx_template_directory: "edx/app/nginx/sites-available"
 
 nginx_cfg:
   #   - link - turn on
@@ -54,3 +54,5 @@ nginx_cfg:
   # nginx configuration
   version_html: "{{ nginx_app_dir }}/versions.html"
   version_json: "{{ nginx_app_dir }}/versions.json"
+
+NGINX_ROBOT_RULES: [ ]

@@ -16,29 +16,14 @@
   vars_files:
     - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"
     - "{{ secure_dir }}/vars/xqueue_prod_vars.yml"
-    - "{{ secure_dir }}/vars/users.yml"
-#    - "{{ secure_dir }}/vars/edxapp_prod_users.yml"
+    - "{{ secure_dir }}/vars/edxapp_prod_users.yml"
 #    - "{{ secure_dir }}/vars/shib_prod_vars.yml"
     - "{{ secure_dir }}/vars/datadog_prod.yml"
   roles:
-    - role: gh_users
-      gh_users:
-        - sefk
-        - jbau
-        - jrbl
-        - ali123
-        - caesar2164
-        - dcadams
-        - nparlante
-        - jarv
-        - e0d
-        - feanil
-      gh_users_no_sudo:
-        - jinpa
-        - gbruhns
-      tags: users
     - common
     - supervisor
+    - role: user
+      tags: users
     - role: edxapp
       celery_worker: True
       devstack: false
@@ -55,20 +40,20 @@
         - xqueue
     - datadog
 
-- name: run the certificate agent on the first util machine only
-  hosts: ~tag_Name_util1_prod
-  sudo: True
-  vars:
-    secure_dir: '../../../configuration-secure/ansible'
-    migrate_db: "no"
-  vars_files:
-    - "roles/common/defaults/main.yml"
-    - "roles/supervisor/defaults/main.yml"
-    - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"
-    - "{{ secure_dir }}/vars/certs_prod_vars.yml"
-  roles:
-    - role: certs
-      tags: certs
+#- name: run the certificate agent on the first util machine only
+#  hosts: ~tag_Name_util1_prod
+#  sudo: True
+#  vars:
+#    secure_dir: '../../../configuration-secure/ansible'
+#    migrate_db: "no"
+#  vars_files:
+#    - "roles/common/defaults/main.yml"
+#    - "roles/supervisor/defaults/main.yml"
+#    - "{{ secure_dir }}/vars/edxapp_prod_vars.yml"
+#    - "{{ secure_dir }}/vars/certs_prod_vars.yml"
+#  roles:
+#    - role: certs
+#      tags: certs
 
 - name: run the notifier on the second util machine only
   hosts: ~tag_Name_util2_prod
