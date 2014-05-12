@@ -35,22 +35,22 @@
       xqueue_create_users: false
       tags: xqueue
 
-- name: deploy certs to first util machine only
-  hosts: ~tag_Name_util1_stage
-  sudo: True
-  gather_facts: True
-  vars:
-    secure_dir: "../../../configuration-secure/ansible"
-    local_dir: "{{secure_dir}}/local"
-    migrate_db: "no"
-  vars_files:
-    - "roles/common/defaults/main.yml"
-    - "roles/supervisor/defaults/main.yml"
-    - "{{ secure_dir }}/vars/edxapp_stage_vars.yml"
-    - "{{ secure_dir }}/vars/certs_stage_vars.yml"
-  roles:
-    - role: certs
-      tags: certs
+#- name: deploy certs to first util machine only
+#  hosts: ~tag_Name_util1_stage
+#  sudo: True
+#  gather_facts: True
+#  vars:
+#    secure_dir: "../../../configuration-secure/ansible"
+#    local_dir: "{{secure_dir}}/local"
+#    migrate_db: "no"
+#  vars_files:
+#    - "roles/common/defaults/main.yml"
+#    - "roles/supervisor/defaults/main.yml"
+#    - "{{ secure_dir }}/vars/edxapp_stage_vars.yml"
+#    - "{{ secure_dir }}/vars/certs_stage_vars.yml"
+#  roles:
+#    - role: certs
+#      tags: certs
 
 - name: run the notifier on the first util machine only
   hosts: ~tag_Name_util1_stage
