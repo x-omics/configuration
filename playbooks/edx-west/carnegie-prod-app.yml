@@ -19,24 +19,10 @@
     - "{{ secure_dir }}/vars/edxapp_prod_users.yml"
     - "{{ secure_dir }}/vars/datadog_carn.yml"
   roles:
-    - role: gh_users
-      gh_users:
-        - sefk
-        - jbau
-        - jrbl
-        - ali123
-        - caesar2164
-        - dcadams
-        - nparlante
-        - jarv
-        - e0d
-        - feanil
-      gh_users_no_sudo:
-        - jinpa
-        - gbruhns
-      tags: users
     - common
     - supervisor
+    - role: user
+      tags: users
     - php
     - role: nginx
       nginx_sites:
