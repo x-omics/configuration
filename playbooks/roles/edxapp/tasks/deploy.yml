@@ -31,11 +31,19 @@
 # back into better shape 
 # see: http://stackoverflow.com/questions/2998832/git-pull-fails-unable-to-resolve-reference-unable-to-update-local-ref)
 - name: local git repo cleanup (git gc --prune=now)
-  command: git gc --prune=now
-  chdir: {{ edxapp_code_dir }}
+  shell: cd {{edxapp_code_dir}} && git gc --prune=now 
+  sudo_user: "{{ edxapp_user }}"
+  ignore_errors: true
+
 - name: local git repo cleanup (git remote prune origin)
-  command: git remote prune origin
-  chdir: {{ edxapp_code_dir }}
+  shell: cd {{edxapp_code_dir}} && git remote prune origin
+  sudo_user: "{{ edxapp_user }}"
+  ignore_errors: true
+
+- name: fetch origin to update git refs (git fetch origin)
+  shell: cd {{edxapp_code_dir}} && git fetch origin
+  sudo_user: "{{ edxapp_user }}"
+  ignore_errors: true
 
 # Do A Checkout
 - name: checkout edx-platform repo into {{edxapp_code_dir}}
