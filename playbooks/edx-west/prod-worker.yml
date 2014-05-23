@@ -10,7 +10,7 @@
   vars:
     # this indicates the path to site-specific (with precedence)
     # things like nginx template files
-    secure_dir: '../../../configuration-secure/ansible'
+    secure_dir: '../../../edx-secret/ansible'
     local_dir:  '{{secure_dir}}/local'
     migrate_db: "no"
   vars_files:
@@ -44,7 +44,7 @@
 #  hosts: ~tag_Name_util1_prod
 #  sudo: True
 #  vars:
-#    secure_dir: '../../../configuration-secure/ansible'
+#    secure_dir: '../../../edx-secret/ansible'
 #    migrate_db: "no"
 #  vars_files:
 #    - "roles/common/defaults/main.yml"
@@ -59,7 +59,7 @@
   hosts: ~tag_Name_util2_prod
   sudo: True
   vars:
-    secure_dir: "../../../configuration-secure/ansible"
+    secure_dir: "../../../edx-secret/ansible"
     local_dir: "{{secure_dir}}/local"
     migrate_db: "no"
   vars_files:

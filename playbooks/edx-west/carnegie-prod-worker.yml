@@ -38,28 +38,28 @@
       tags: xqueue
     - datadog
 
-- name: Deploy certs only to first util machine
-  hosts: ~tag_Name_util(1)_carn
-  sudo: True
-  gather_facts: True
-  vars:
-    secure_dir: '../../../configuration-secure/ansible'
-    local_dir: "{{secure_dir}}/local"
-    migrate_db: "no"
-  vars_files:
-    - "roles/common/defaults/main.yml"
-    - "roles/supervisor/defaults/main.yml"
-    - "{{ secure_dir }}/vars/edxapp_carnegie_vars.yml"
-    - "{{ secure_dir }}/vars/certs_carn_vars.yml"
-  roles:
-    - role: certs
-      tags: certs
+##- name: Deploy certs only to first util machine
+#  hosts: ~tag_Name_util(1)_carn
+#  sudo: True
+#  gather_facts: True
+#  vars:
+#    secure_dir: '../../../edx-secret/ansible'
+#    local_dir: "{{secure_dir}}/local"
+#    migrate_db: "no"
+#  vars_files:
+#    - "roles/common/defaults/main.yml"
+#    - "roles/supervisor/defaults/main.yml"
+#    - "{{ secure_dir }}/vars/edxapp_carnegie_vars.yml"
+#    - "{{ secure_dir }}/vars/certs_carn_vars.yml"
+#  roles:
+#    - role: certs
+#      tags: certs
 
 ## run the certificate agent on the first util machine only
 #- hosts: ~tag_Name_util10_carn
 #  sudo: True
 #  vars:
-#    secure_dir: '../../../configuration-secure/ansible'
+#    secure_dir: '../../../edx-secret/ansible'
 #    migrate_db: "no"
 #  vars_files:
 #    - "{{ secure_dir }}/vars/edxapp_carnegie_vars.yml"

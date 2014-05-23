@@ -56,7 +56,7 @@
   hosts: ~tag_Name_util1_stage
   sudo: True
   vars:
-    secure_dir: "../../../configuration-secure/ansible"
+    secure_dir: "../../../edx-secret/ansible"
     local_dir: "{{secure_dir}}/local"
     migrate_db: "no"
   vars_files:
