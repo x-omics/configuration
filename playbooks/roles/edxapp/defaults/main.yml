@@ -497,7 +497,7 @@ lms_env_config:
       VMEM: 134217728
       # Time in seconds that the jailed process has to run.
       REALTIME: 1
-      # Needs to be non-zero so that jailed code can use it as their temp directory.(1MiB in bytes)
+      # Needs to be non-zero so that jailed code can use its tem directory.(1MiB in bytes)
       FSIZE: 1048576
     user: '{{ edxapp_sandbox_user }}'
 
