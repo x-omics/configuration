@@ -1,0 +1,30 @@
+---
+# mongo_mms
+#
+# Example play:
+#
+#   roles:
+#   - mongo_mms
+
+- fail: MMSAPIKEY is required
+  when: MMSAPIKEY is not defined 
+
+- name: download mongo mms agent
+  get_url: >
+    url={{ mms_agent_url }}
+    dest={{ /tmp/mongodb-mms-monitoring-agent.deb }}
+
+- name: install mongo mms agent
+  apt: >
+    deb=/edx/mongodb-mms-monitoring-agent.deb
+
+- name: add key to monitoring-agent.config
+  lineinfile: >
+    dest=/etc/mongodb-mms/monitoring-agent.config
+    regexp="^mmsApiKey="
+    line="mmsApiKey={{ MMSAPIKEY }}"
+  notify: restart mms
+
+- name: start mms service
+  service: name=mongodb-mms-monitoring-agent state=started
+
