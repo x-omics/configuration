@@ -1,0 +1,72 @@
+COMMON_PYPI_MIRROR_URL: 'http://pypi.douban.com/simple'
+COMMON_GIT_MIRROR: 'github.com'
+COMMON_SSH_PASSWORD_AUTH: "yes"
+
+
+COMMON_MYSQL_READ_ONLY_USER: 'read_only'
+COMMON_MYSQL_READ_ONLY_PASS: !!null
+COMMON_MYSQL_ADMIN_USER: 'admin'
+COMMON_MYSQL_ADMIN_PASS: !!null
+COMMON_MYSQL_MIGRATE_USER: 'migrate'
+COMMON_MYSQL_MIGRATE_PASS: !!null
+
+COMMON_MONGO_READ_ONLY_USER: 'read_only'
+COMMON_MONGO_READ_ONLY_PASS: !!null
+
+
+mongo_port: "27017"
+
+MONGO_USERS:
+  - user: cs_comments_service
+    password: password
+    database: cs_comments_service
+  - user: exdapp
+    password: password
+    database: edxapp
+
+MONGO_CLUSTERED: !!null
+MONGO_BIND_IP: 127.0.0.1
+
+EDXAPP_MONGO_HOSTS: ['localhost']
+EDXAPP_MONGO_PASSWORD: 'password'
+EDXAPP_MONGO_PORT: 27017
+EDXAPP_MONGO_USER: 'edxapp'
+EDXAPP_MONGO_DB_NAME: 'edxapp'
+
+EDXAPP_MYSQL_DB_NAME: 'edxapp'
+EDXAPP_MYSQL_USER: 'edxapp001'
+EDXAPP_MYSQL_USER_ADMIN: 'root'
+EDXAPP_MYSQL_USER_MIGRATE: 'migrate'
+EDXAPP_MYSQL_PASSWORD: 'password'
+EDXAPP_MYSQL_PASSWORD_READ_ONLY: 'password'
+EDXAPP_MYSQL_PASSWORD_ADMIN: 'password'
+EDXAPP_MYSQL_PASSWORD_MIGRATE: 'password'
+
+EDXAPP_MYSQL_HOST: 'localhost'
+EDXAPP_MYSQL_PORT: '3306'
+
+EDXAPP_MEMCACHE: [ 'localhost:11211' ]
+
+EDXAPP_LMS_BASE: 'www.x-omics.org'
+EDXAPP_PREVIEW_LMS_BASE: 'preview.x-omics.org'
+EDXAPP_CMS_BASE: 'studio.x-omics.org'
+
+EDXAPP_SITE_NAME: 'www.x-omics.org'
+
+EDXAPP_LANG: 'en_US.UTF-8'
+EDXAPP_LANGUAGE_CODE : 'zh-cn'
+EDXAPP_TIME_ZONE: 'Asia/Shanghai'
+
+EDXAPP_TECH_SUPPORT_EMAIL: 'xomics@genomics.cn'
+EDXAPP_CONTACT_EMAIL: 'xomics@genomics.cn'
+EDXAPP_BUGS_EMAIL: 'xomics@genomics.cn'
+EDXAPP_DEFAULT_FROM_EMAIL: 'xomics@genomics.cn'
+EDXAPP_DEFAULT_FEEDBACK_EMAIL: 'xomics@genomics.cn'
+EDXAPP_DEFAULT_SERVER_EMAIL: 'xomics@genomics.cn'
+EDXAPP_BULK_EMAIL_DEFAULT_FROM_EMAIL: 'xomics@genomics.cn'
+
+
+edx_platform_repo: "https://github.com/x-omics/edx-platform.git"
+
+ora_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
+discern_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
