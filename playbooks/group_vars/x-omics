@@ -65,6 +65,10 @@ EDXAPP_DEFAULT_FEEDBACK_EMAIL: 'xomics@genomics.cn'
 EDXAPP_DEFAULT_SERVER_EMAIL: 'xomics@genomics.cn'
 EDXAPP_BULK_EMAIL_DEFAULT_FROM_EMAIL: 'xomics@genomics.cn'
 
+edxapp_use_custom_theme: true
+edxapp_theme_name: 'xomics-theme'
+edxapp_theme_source_repo: 'git://github.com/x-omics/xomics-theme.git'
+edxapp_theme_version: 'HEAD'
 
 edx_platform_repo: "https://github.com/x-omics/edx-platform.git"
 
