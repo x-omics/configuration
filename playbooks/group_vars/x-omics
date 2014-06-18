@@ -76,5 +76,4 @@ edxapp_theme_version: 'HEAD'
 
 edx_platform_repo: "https://github.com/x-omics/edx-platform.git"
 
-ora_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
 discern_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
