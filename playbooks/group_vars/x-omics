@@ -51,11 +51,14 @@ EDXAPP_LMS_BASE: 'www.x-omics.org'
 EDXAPP_PREVIEW_LMS_BASE: 'preview.x-omics.org'
 EDXAPP_CMS_BASE: 'studio.x-omics.org'
 
+EDXAPP_PLATFORM_NAME: 'x-omics'
 EDXAPP_SITE_NAME: 'www.x-omics.org'
+EDXAPP_CMS_SITE_NAME: 'studio.x-omics.org'
 
 EDXAPP_LANG: 'en_US.UTF-8'
 EDXAPP_LANGUAGE_CODE : 'zh-cn'
 EDXAPP_TIME_ZONE: 'Asia/Shanghai'
+
 
 EDXAPP_TECH_SUPPORT_EMAIL: 'xomics@genomics.cn'
 EDXAPP_CONTACT_EMAIL: 'xomics@genomics.cn'
@@ -64,6 +67,7 @@ EDXAPP_DEFAULT_FROM_EMAIL: 'xomics@genomics.cn'
 EDXAPP_DEFAULT_FEEDBACK_EMAIL: 'xomics@genomics.cn'
 EDXAPP_DEFAULT_SERVER_EMAIL: 'xomics@genomics.cn'
 EDXAPP_BULK_EMAIL_DEFAULT_FROM_EMAIL: 'xomics@genomics.cn'
+
 
 edxapp_use_custom_theme: true
 edxapp_theme_name: 'xomics-theme'
