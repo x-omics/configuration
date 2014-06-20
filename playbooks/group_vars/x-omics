@@ -13,6 +13,7 @@ COMMON_MYSQL_MIGRATE_PASS: !!null
 COMMON_MONGO_READ_ONLY_USER: 'read_only'
 COMMON_MONGO_READ_ONLY_PASS: !!null
 
+MONGODB_REPO: "deb http://mirrors.bistu.edu.cn/mongodb/repo/ubuntu-upstart dist 10gen"
 
 mongo_port: "27017"
 
