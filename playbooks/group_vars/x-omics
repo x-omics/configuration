@@ -84,3 +84,6 @@ edxapp_theme_version: 'HEAD'
 edx_platform_repo: "https://github.com/x-omics/edx-platform.git"
 
 discern_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
+
+edx_ansible_source_repo: https://github.com/x-omics/configuration.git
+
