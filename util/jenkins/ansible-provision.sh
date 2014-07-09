@@ -81,7 +81,7 @@ fi
 
 if [[ -z $ami ]]; then
   if [[ $server_type == "full_edx_installation" ]]; then
-    ami="ami-97dbc3fe"
+    ami="ami-f0814498"
   elif [[ $server_type == "ubuntu_12.04" || $server_type == "full_edx_installation_from_scratch" ]]; then
     ami="ami-59a4a230"
   elif [[ $server_type == "ubuntu_14.04(experimental)" ]]; then
@@ -131,11 +131,18 @@ EOF
 if [[ $basic_auth == "true" ]]; then
     # vars specific to provisioning added to $extra-vars
     cat << EOF_AUTH >> $extra_vars_file
+COMMON_ENABLE_BASIC_AUTH: True
 COMMON_HTPASSWD_USER: $auth_user
 COMMON_HTPASSWD_PASS: $auth_pass
 XQUEUE_BASIC_AUTH_USER: $auth_user
 XQUEUE_BASIC_AUTH_PASSWORD: $auth_pass
 EOF_AUTH
+
+else
+    cat << EOF_AUTH >> $extra_vars_file
+COMMON_ENABLE_BASIC_AUTH: False
+EOF_AUTH
+
 fi
 
 if [[ $edx_internal == "true" ]]; then
@@ -194,7 +201,7 @@ EOF
 
     # run the tasks to launch an ec2 instance from AMI
     cat $extra_vars_file
-    ansible-playbook edx_provision.yml  -i inventory.ini $extra_var_arg --user ubuntu  -v
+    ansible-playbook edx_provision.yml  -i inventory.ini $extra_var_arg --user ubuntu
 
     if [[ $server_type == "full_edx_installation" ]]; then
         # additional tasks that need to be run if the
@@ -217,12 +224,12 @@ if [[ $reconfigure == "true" || $server_type == "full_edx_installation_from_scra
     ansible-playbook edx_continuous_integration.yml -i "${deploy_host}," $extra_var_arg --user ubuntu
 fi
 
-if [[ $server_type == "full_edx_installation" ]]; then
+if [[ $reconfigure != "true" && $server_type == "full_edx_installation" ]]; then
     # Run deploy tasks for the roles selected
     for i in $roles; do
         if [[ ${deploy[$i]} == "true" ]]; then
             cat $extra_vars_file
-            ansible-playbook ${i}.yml -i "${deploy_host}," $extra_var_arg --user ubuntu --tags deploy -v
+            ansible-playbook ${i}.yml -i "${deploy_host}," $extra_var_arg --user ubuntu --tags deploy
         fi
     done
 fi

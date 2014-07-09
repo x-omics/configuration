@@ -32,11 +32,9 @@ EDXAPP_MONGO_DB_NAME: 'edxapp'
 EDXAPP_MYSQL_DB_NAME: 'edxapp'
 EDXAPP_MYSQL_USER: 'edxapp001'
 EDXAPP_MYSQL_USER_ADMIN: 'root'
-EDXAPP_MYSQL_USER_MIGRATE: 'migrate'
 EDXAPP_MYSQL_PASSWORD: 'password'
 EDXAPP_MYSQL_PASSWORD_READ_ONLY: 'password'
 EDXAPP_MYSQL_PASSWORD_ADMIN: 'password'
-EDXAPP_MYSQL_PASSWORD_MIGRATE: 'password'
 EDXAPP_MYSQL_REPLICA_DB_NAME: "{{ EDXAPP_MYSQL_DB_NAME }}"
 EDXAPP_MYSQL_REPLICA_USER: "{{ EDXAPP_MYSQL_USER }}"
 EDXAPP_MYSQL_REPLICA_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
@@ -66,10 +64,15 @@ EDXAPP_OEE_USER: 'lms'
 EDXAPP_OEE_PASSWORD: 'password'
 
 EDXAPP_ANALYTICS_API_KEY:  ''
+EDXAPP_PAYMENT_SUPPORT_EMAIL: "billing@example.com"
 EDXAPP_ZENDESK_USER: ''
+EDXAPP_ZENDESK_URL: ''
 EDXAPP_ZENDESK_API_KEY: ''
 EDXAPP_CELERY_USER: 'celery'
 EDXAPP_CELERY_PASSWORD: 'celery'
+
+EDXAPP_VIDEO_CDN_URLS:
+  EXAMPLE_COUNTRY_CODE: "http://example.com/edx/video?s3_url="
 
 EDXAPP_PLATFORM_NAME: 'Your Platform Name Here'
 
@@ -80,6 +83,9 @@ EDXAPP_CAS_ATTRIBUTE_PACKAGE: ''
 # Enable an end-point that creates a user and logs them in
 # Used for performance testing
 EDXAPP_ENABLE_AUTO_AUTH: false
+# Settings for enabling and configuring third party authorization
+EDXAPP_ENABLE_THIRD_PARTY_AUTH: false
+EDXAPP_THIRD_PARTY_AUTH: !!null
 
 EDXAPP_FEATURES:
   AUTH_USE_OPENID_PROVIDER: true
@@ -92,6 +98,7 @@ EDXAPP_FEATURES:
   ENABLE_S3_GRADE_DOWNLOADS: true
   USE_CUSTOM_THEME: $edxapp_use_custom_theme
   AUTOMATIC_AUTH_FOR_TESTING: $EDXAPP_ENABLE_AUTO_AUTH
+  ENABLE_THIRD_PARTY_AUTH: $EDXAPP_ENABLE_THIRD_PARTY_AUTH
 
 EDXAPP_BOOK_URL: ''
 # This needs to be set to localhost
@@ -190,9 +197,6 @@ EDXAPP_USE_GIT_IDENTITY: false
 # into this var
 EDXAPP_GIT_IDENTITY: !!null
 
-# Configuration for database migration
-EDXAPP_TEST_MIGRATE_DB_NAME: "{{ COMMON_ENVIRONMENT }}_{{ COMMON_DEPLOYMENT }}_test_{{ EDXAPP_MYSQL_DB_NAME }}"
-
 EDXAPP_UPDATE_STATIC_FILES_KEY: false
 # Set this to true if you want to install the private pip
 # requirements in the edx-platform repo.
@@ -205,7 +209,12 @@ EDXAPP_INSTALL_PRIVATE_REQUIREMENTS: false
 EDXAPP_GOOGLE_ANALYTICS_ACCOUNT: "UA-DUMMY"
 
 EDXAPP_PEARSON_TEST_PASSWORD: ""
+EDXAPP_SEGMENT_IO_LMS: false
 EDXAPP_SEGMENT_IO_LMS_KEY: ""
+# For the CMS
+EDXAPP_SEGMENT_IO_KEY: ""
+EDXAPP_SEGMENT_IO: false
+
 EDXAPP_EDX_API_KEY: ""
 # This is the default set in common.py
 EDXAPP_VERIFY_STUDENT:
@@ -226,8 +235,20 @@ EDXAPP_XML_FROM_GIT: false
 EDXAPP_XML_S3_BUCKET: !!null
 EDXAPP_XML_S3_KEY: !!null
 
-EDXAPP_NEWRELIC_LMS_APPNAME: "edX-LMS"
-EDXAPP_NEWRELIC_CMS_APPNAME: "edX-CMS"
+EDXAPP_NEWRELIC_LMS_APPNAME: "{{COMMON_ENVIRONMENT}}-{{COMMON_DEPLOYMENT}}-edxapp-lms"
+EDXAPP_NEWRELIC_CMS_APPNAME: "{{COMMON_ENVIRONMENT}}-{{COMMON_DEPLOYMENT}}-edxapp-cms"
+
+EDXAPP_ORA2_FILE_PREFIX: '{{COMMON_ENVIRONMENT}}-{{COMMON_DEPLOYMENT}}/ora2'
+EDXAPP_CODE_JAIL_LIMITS:
+  # Limit the memory of the jailed process to something high but not
+  # infinite (128MiB in bytes)
+  VMEM: 134217728
+  # Time in seconds that the jailed process has to run.
+  REALTIME: 1
+  # Needs to be non-zero so that jailed code can use it as their temp directory.(1MiB in bytes)
+  FSIZE: 1048576
+
+
 #-------- Everything below this line is internal to the role ------------
 
 #Use YAML references (& and *) and hash merge <<: to factor out shared settings
@@ -399,8 +420,11 @@ edxapp_generic_auth_config:  &edxapp_generic_auth
   CELERY_BROKER_USER: $EDXAPP_CELERY_USER
   CELERY_BROKER_PASSWORD: $EDXAPP_CELERY_PASSWORD
   GOOGLE_ANALYTICS_ACCOUNT: $EDXAPP_GOOGLE_ANALYTICS_ACCOUNT
+  THIRD_PARTY_AUTH: $EDXAPP_THIRD_PARTY_AUTH
 
 generic_env_config:  &edxapp_generic_env
+  PAYMENT_SUPPORT_EMAIL: $EDXAPP_PAYMENT_SUPPORT_EMAIL
+  ZENDESK_URL: $EDXAPP_ZENDESK_URL
   COURSES_WITH_UNSAFE_CODE: $EDXAPP_COURSES_WITH_UNSAFE_CODE
   BULK_EMAIL_EMAILS_PER_TASK: $EDXAPP_BULK_EMAIL_EMAILS_PER_TASK
   MICROSITE_ROOT_DIR: $EDXAPP_MICROSITE_ROOT_DIR
@@ -461,7 +485,8 @@ generic_env_config:  &edxapp_generic_env
   LOGGING_ENV: $EDXAPP_LOGGING_ENV
   SESSION_COOKIE_DOMAIN:  $EDXAPP_SESSION_COOKIE_DOMAIN
   COMMENTS_SERVICE_KEY: $EDXAPP_COMMENTS_SERVICE_KEY
-  SEGMENT_IO_LMS: true
+  SEGMENT_IO_LMS: $EDXAPP_SEGMENT_IO_LMS
+  SEGMENT_IO: $EDXAPP_SEGMENT_IO
   THEME_NAME: $edxapp_theme_name
   TECH_SUPPORT_EMAIL: $EDXAPP_TECH_SUPPORT_EMAIL
   CONTACT_EMAIL: $EDXAPP_CONTACT_EMAIL
@@ -479,6 +504,8 @@ generic_env_config:  &edxapp_generic_env
   PRESS_EMAIL: $EDXAPP_PRESS_EMAIL
   PLATFORM_TWITTER_ACCOUNT: $EDXAPP_PLATFORM_TWITTER_ACCOUNT
   PLATFORM_FACEBOOK_ACCOUNT: $EDXAPP_PLATFORM_FACEBOOK_ACCOUNT
+  ORA2_FILE_PREFIX: $EDXAPP_ORA2_FILE_PREFIX
+
 
 lms_auth_config:
   <<: *edxapp_generic_auth
@@ -519,19 +546,12 @@ lms_env_config:
   <<: *edxapp_generic_env
   PAID_COURSE_REGISTRATION_CURRENCY: $EDXAPP_PAID_COURSE_REGISTRATION_CURRENCY
   SITE_NAME:  $EDXAPP_LMS_SITE_NAME
+  VIDEO_CDN_URL: $EDXAPP_VIDEO_CDN_URLS
   CODE_JAIL:
     # from https://github.com/edx/codejail/blob/master/codejail/django_integration.py#L24, '' should be same as None
     python_bin: '{% if EDXAPP_PYTHON_SANDBOX %}{{ edxapp_sandbox_venv_dir }}/bin/python{% endif %}'
-    limits:
-      # Limit the memory of the jailed process to something high but not
-      # infinite (128MiB in bytes)
-      VMEM: 134217728
-      # Time in seconds that the jailed process has to run.
-      REALTIME: 1
-      # Needs to be non-zero so that jailed code can use it as their temp directory.(1MiB in bytes)
-      FSIZE: 1048576
+    limits: $EDXAPP_CODE_JAIL_LIMITS
     user: '{{ edxapp_sandbox_user }}'
-
 cms_auth_config:
   <<: *edxapp_generic_auth
 cms_env_config:
