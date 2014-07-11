@@ -290,10 +290,6 @@ cat << EOF >> $extra_vars
 # up healthy
 fake_migrations: true
 
-# Use the build number an the dynamic cache key.
-EDXAPP_UPDATE_STATIC_FILES_KEY: true
-edxapp_dynamic_cache_key: {deployment}-{environment}-{play}-{cache_id}
-
 disable_edx_services: true
 COMMON_TAG_EC2_INSTANCE: true
 
@@ -525,10 +521,10 @@ def create_ami(instance_id, name, description):
                 img.add_tag("play", args.play)
                 time.sleep(AWS_API_WAIT_TIME)
                 conf_tag = "{} {}".format("http://github.com/edx/configuration", args.configuration_version)
-                img.add_tag("version: configuration", conf_tag)
+                img.add_tag("version:configuration", conf_tag)
                 time.sleep(AWS_API_WAIT_TIME)
                 conf_secure_tag = "{} {}".format(args.configuration_secure_repo, args.configuration_secure_version)
-                img.add_tag("version: configuration_secure", conf_secure_tag)
+                img.add_tag("version:configuration_secure", conf_secure_tag)
                 time.sleep(AWS_API_WAIT_TIME)
                 img.add_tag("cache_id", args.cache_id)
                 time.sleep(AWS_API_WAIT_TIME)
