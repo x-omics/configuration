@@ -57,7 +57,17 @@ server {
     {% include "basic-auth.j2" %}
     try_files $uri @proxy_to_lms_app;
   }
-
+  
+  location /register {
+  
+        satisfy any;
+        allow 127.0.0.1;
+        allow 10.0.0.0/8;
+        allow 192.168.0.0/16;
+        allow 172.16.0.0/12;
+        deny all;
+  }
+  
   # No basic auth security on the github_service_hook url, so that github can use it for cms
   location /github_service_hook {
     try_files $uri @proxy_to_lms_app;
