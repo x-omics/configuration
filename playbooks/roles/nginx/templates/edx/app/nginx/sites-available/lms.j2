@@ -54,7 +54,6 @@ server {
   }
 
   location / {
-    {% include "basic-auth.j2" %}
     try_files $uri @proxy_to_lms_app;
   }
   
