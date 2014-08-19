@@ -18,7 +18,7 @@ except ImportError:
 
 from pprint import pprint
 
-AMI_TIMEOUT = 600  # time to wait for AMIs to complete
+AMI_TIMEOUT = 1800  # time to wait for AMIs to complete(30 minutes)
 EC2_RUN_TIMEOUT = 180  # time to wait for ec2 state transition
 EC2_STATUS_TIMEOUT = 300  # time to wait for ec2 system status checks
 NUM_TASKS = 5  # number of tasks for time summary report
@@ -218,7 +218,7 @@ config_secure={config_secure}
 git_repo_name="configuration"
 git_repo="https://github.com/edx/$git_repo_name"
 git_repo_secure="{configuration_secure_repo}"
-git_repo_secure_name="{configuration_secure_repo_basename}"
+git_repo_secure_name=$(basename $git_repo_secure .git)
 git_repo_private="{configuration_private_repo}"
 git_repo_private_name=$(basename $git_repo_private .git)
 secure_vars_file={secure_vars_file}
@@ -350,8 +350,6 @@ rm -rf $base_dir
                 configuration_version=args.configuration_version,
                 configuration_secure_version=args.configuration_secure_version,
                 configuration_secure_repo=args.configuration_secure_repo,
-                configuration_secure_repo_basename=os.path.basename(
-                    args.configuration_secure_repo),
                 configuration_private_version=args.configuration_private_version,
                 configuration_private_repo=args.configuration_private_repo,
                 environment=args.environment,

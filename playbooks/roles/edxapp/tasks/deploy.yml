@@ -111,12 +111,22 @@
   - "restart edxapp_workers"
 
 # Set the npm registry
+# This needs to be done as root since npm is weird about
+# chown - https://github.com/npm/npm/issues/3565
 - name: Set the npm registry
   shell:
     npm config set registry '{{ COMMON_NPM_MIRROR_URL }}'
     creates="{{ edxapp_app_dir }}/.npmrc"
-  sudo_user: "{{ edxapp_user }}"
   environment: "{{ edxapp_environment }}"
+  notify:
+  - "restart edxapp"
+  - "restart edxapp_workers"
+
+# Set the npm registry permissions
+- name: Set the npm registry permissions
+  file:
+    path="{{ edxapp_app_dir }}/.npmrc"
+    owner=edxapp group=edxapp
   notify:
   - "restart edxapp"
   - "restart edxapp_workers"
@@ -188,6 +198,25 @@
   - "restart edxapp_workers"
   when: not inst.stat.exists or new.stat.md5 != inst.stat.md5
 
+# Install the python custom requirements into {{ edxapp_venv_dir }}
+
+- stat: path="{{ custom_requirements_file }}"
+  register: custom_requirements
+  sudo_user: "{{ edxapp_user }}"
+
+- name : install python custom-requirements
+  pip: >
+    requirements="{{ custom_requirements_file }}"
+    virtualenv="{{ edxapp_venv_dir }}"
+    state=present
+    extra_args="-i {{ COMMON_PYPI_MIRROR_URL }}"
+  sudo_user: "{{ edxapp_user }}"
+  environment: "{{ edxapp_environment }}"
+  notify:
+  - "restart edxapp"
+  - "restart edxapp_workers"
+  when: custom_requirements.stat.exists and new.stat.md5 != inst.stat.md5
+
 # Install the final python modules into {{ edxapp_venv_dir }}
 - name : install python post-post requirements
   # Need to use shell rather than pip so that we can maintain the context of our current working directory; some
@@ -252,33 +281,6 @@
   notify:
   - "restart edxapp"
   - "restart edxapp_workers"
-
-# The next few tasks install xml courses.
-
-# Install the xml courses from an s3 bucket
-- name: get s3 one time url
-  s3: >
-    bucket="{{ EDXAPP_XML_S3_BUCKET }}"
-    object="{{ EDXAPP_XML_S3_KEY }}"
-    mode="geturl"
-    expiration=300
-  when: not EDXAPP_XML_FROM_GIT and EDXAPP_XML_S3_BUCKET and EDXAPP_XML_S3_KEY
-  register: s3_one_time_url
-
-- name: download from one time url
-  get_url: url="{{ s3_one_time_url.url }}" dest="/tmp/{{ EDXAPP_XML_S3_KEY|basename }}"
-  when: not EDXAPP_XML_FROM_GIT and EDXAPP_XML_S3_BUCKET and EDXAPP_XML_S3_KEY
-  register: download_xml_s3
-
-- name: unzip the data to the data dir
-  shell: >
-    tar xzf /tmp/{{ EDXAPP_XML_S3_KEY|basename }}
-    chdir="{{ edxapp_data_dir }}"
-  when: download_xml_s3.changed
-
-- include: xml.yml
-  tags: deploy
-  when: EDXAPP_XML_FROM_GIT
 
 # The next few tasks set up the python code sandbox
 
@@ -360,6 +362,32 @@
   - "restart edxapp"
   - "restart edxapp_workers"
 
+# The next few tasks install xml courses.
+
+# Install the xml courses from an s3 bucket
+- name: get s3 one time url
+  s3: >
+    bucket="{{ EDXAPP_XML_S3_BUCKET }}"
+    object="{{ EDXAPP_XML_S3_KEY }}"
+    mode="geturl"
+    expiration=30
+  when: not EDXAPP_XML_FROM_GIT and EDXAPP_XML_S3_BUCKET and EDXAPP_XML_S3_KEY
+  register: s3_one_time_url
+
+- name: download from one time url
+  get_url:
+    url="{{ s3_one_time_url.url }}"
+    dest="{{ edxapp_data_dir }}/{{ EDXAPP_XML_S3_KEY|basename }}"
+    mode=0600
+  when: not EDXAPP_XML_FROM_GIT and EDXAPP_XML_S3_BUCKET and EDXAPP_XML_S3_KEY
+  register: download_xml_s3
+
+- name: unzip the data to the data dir
+  shell: >
+    tar xzf {{ edxapp_data_dir }}/{{ EDXAPP_XML_S3_KEY|basename }}
+    chdir="{{ edxapp_data_dir }}"
+  when: download_xml_s3.changed
+
 # creates the supervisor jobs for the
 # service variants configured, runs
 # gather_assets and db migrations
@@ -367,6 +395,10 @@
   tags:
     - service_variant_config
     - deploy
+
+- include: xml.yml
+  tags: deploy
+  when: EDXAPP_XML_FROM_GIT
 
   # call supervisorctl update. this reloads
   # the supervisorctl config and restarts

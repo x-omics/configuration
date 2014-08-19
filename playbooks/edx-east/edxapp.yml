@@ -2,6 +2,7 @@
   hosts: all
   sudo: True
   gather_facts: True
+  vars:
   roles:
     - aws
     - role: nginx
@@ -10,6 +11,8 @@
       - cms
       nginx_default_sites:
       - lms
+      nginx_extra_sites: "{{ NGINX_EDXAPP_EXTRA_SITES }}"
+      nginx_extra_configs: "{{ NGINX_EDXAPP_EXTRA_CONFIGS }}"
     - edxapp
     - role: datadog
       when: COMMON_ENABLE_DATADOG
