@@ -18,7 +18,7 @@ except ImportError:
 
 from pprint import pprint
 
-AMI_TIMEOUT = 1800  # time to wait for AMIs to complete(30 minutes)
+AMI_TIMEOUT = 2700  # time to wait for AMIs to complete(45 minutes)
 EC2_RUN_TIMEOUT = 180  # time to wait for ec2 state transition
 EC2_STATUS_TIMEOUT = 300  # time to wait for ec2 system status checks
 NUM_TASKS = 5  # number of tasks for time summary report
@@ -117,6 +117,10 @@ def parse_args():
                         default=None,
                         help="The API ID of the Hipchat room to post"
                              "status messages to")
+    parser.add_argument("--ansible-hipchat-room-id", required=False,
+                        default='Hammer',
+                        help="The room used by the abbey instance for "
+                             "printing verbose ansible run data.")
     parser.add_argument("--hipchat-api-token", required=False,
                         default=None,
                         help="The API token for Hipchat integration")
@@ -346,7 +350,7 @@ rm -rf $base_dir
 
     """.format(
                 hipchat_token=args.hipchat_api_token,
-                hipchat_room=args.hipchat_room_id,
+                hipchat_room=args.ansible_hipchat_room_id,
                 configuration_version=args.configuration_version,
                 configuration_secure_version=args.configuration_secure_version,
                 configuration_secure_repo=args.configuration_secure_repo,

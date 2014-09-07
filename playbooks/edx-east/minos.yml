@@ -1,0 +1,9 @@
+- name: Deploy edxapp
+  hosts: all
+  sudo: True
+  gather_facts: True
+  vars:
+  roles:
+    - common
+    - aws
+    - minos 

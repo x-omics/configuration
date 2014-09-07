@@ -20,6 +20,9 @@ EDXAPP_LMS_BASE: ""
 EDXAPP_PREVIEW_LMS_BASE: ""
 EDXAPP_CMS_BASE: ""
 
+EDXAPP_LMS_GUNICORN_EXTRA: ""
+EDXAPP_CMS_GUNICORN_EXTRA: ""
+
 # Set this to the maximum number
 # of requests for gunicorn for the lms and cms
 # gunicorn --max-requests <num>
@@ -55,6 +58,9 @@ EDXAPP_MYSQL_REPLICA_PORT: "{{ EDXAPP_MYSQL_PORT }}"
 
 EDXAPP_MYSQL_HOST: 'localhost'
 EDXAPP_MYSQL_PORT: '3306'
+
+EDXAPP_LMS_ENV: 'lms.envs.aws'
+EDXAPP_CMS_ENV: 'cms.envs.aws'
 
 EDXAPP_EMAIL_BACKEND: 'django.core.mail.backends.smtp.EmailBackend'
 EDXAPP_EMAIL_HOST: 'localhost'
@@ -113,6 +119,7 @@ EDXAPP_FEATURES:
   PREVIEW_LMS_BASE: "{{ EDXAPP_PREVIEW_LMS_BASE }}"
   ENABLE_S3_GRADE_DOWNLOADS: true
   USE_CUSTOM_THEME: $edxapp_use_custom_theme
+  ENABLE_MKTG_SITE: $EDXAPP_ENABLE_MKTG_SITE
   AUTOMATIC_AUTH_FOR_TESTING: $EDXAPP_ENABLE_AUTO_AUTH
   ENABLE_THIRD_PARTY_AUTH: $EDXAPP_ENABLE_THIRD_PARTY_AUTH
 
@@ -140,6 +147,11 @@ EDXAPP_LMS_PREVIEW_NGINX_PORT: 18020
 EDXAPP_CMS_NGINX_PORT: 18010
 EDXAPP_CMS_SSL_NGINX_PORT: 48010
 
+# NGINX Rate limiting related vars
+EDXAPP_ENABLE_RATE_LIMITING: false
+EDXAPP_COURSE_REQUEST_RATE: '5r/s'
+EDXAPP_COURSE_REQUEST_BURST_RATE: 10
+
 EDXAPP_LANG: 'en_US.UTF-8'
 EDXAPP_LANGUAGE_CODE : 'en'
 EDXAPP_TIME_ZONE: 'America/New_York'
@@ -155,9 +167,16 @@ EDXAPP_UNIVERSITY_EMAIL: 'university@example.com'
 EDXAPP_PRESS_EMAIL: 'press@example.com'
 EDXAPP_PLATFORM_TWITTER_ACCOUNT: '@YourPlatformTwitterAccount'
 EDXAPP_PLATFORM_FACEBOOK_ACCOUNT: 'http://www.facebook.com/YourPlatformFacebookAccount'
+EDXAPP_PLATFORM_TWITTER_URL: "https://twitter.com/YourPlatformTwitterAccount"
+EDXAPP_PLATFORM_MEETUP_URL: "http://www.meetup.com/YourMeetup"
+EDXAPP_PLATFORM_LINKEDIN_URL: "http://www.linkedin.com/company/YourPlatform"
+EDXAPP_PLATFORM_GOOGLE_PLUS_URL: "https://plus.google.com/YourGooglePlusAccount/"
 
 EDXAPP_ENV_EXTRA: {}
 EDXAPP_AUTH_EXTRA: {}
+EDXAPP_LMS_AUTH_EXTRA: "{{ EDXAPP_AUTH_EXTRA }}"
+EDXAPP_CMS_AUTH_EXTRA: "{{ EDXAPP_AUTH_EXTRA }}"
+EDXAPP_ENABLE_MKTG_SITE: false
 EDXAPP_MKTG_URL_LINK_MAP: {}
 EDXAPP_MKTG_URLS: {}
 # Set this sets the url for static files
@@ -171,6 +190,7 @@ EDXAPP_GRADE_BUCKET: 'edx-grades'
 EDXAPP_GRADE_ROOT_PATH: '/tmp/edx-s3/grades'
 # Credit card processor
 # These are the same defaults set in common.py
+EDXAPP_CC_PROCESSOR_NAME: "CyberSource"
 EDXAPP_CC_PROCESSOR:
   CyberSource:
     SHARED_SECRET: ""
@@ -178,6 +198,11 @@ EDXAPP_CC_PROCESSOR:
     SERIAL_NUMBER: ""
     ORDERPAGE_VERSION: '7'
     PURCHASE_ENDPOINT: ""
+  CyberSource2:
+    PURCHASE_ENDPOINT: ""
+    SECRET_KEY: ""
+    ACCESS_KEY: ""
+    PROFILE_ID: ""
 
 # does not affect verified students
 EDXAPP_PAID_COURSE_REGISTRATION_CURRENCY: ['usd', '$']
@@ -282,6 +307,17 @@ EDXAPP_SUBDOMAIN_BRANDING: {}
 EDXAPP_WORKERS: !!null
 EDXAPP_ANALYTICS_DATA_TOKEN: ""
 EDXAPP_ANALYTICS_DATA_URL: ""
+
+EDXAPP_REGISTRATION_EXTRA_FIELDS:
+  level_of_education: "optional"
+  gender: "optional"
+  year_of_birth: "optional"
+  mailing_address: "optional"
+  goals: "optional"
+  honor_code: "required"
+  city: "hidden"
+  country: "hidden"
+
 #-------- Everything below this line is internal to the role ------------
 
 #Use YAML references (& and *) and hash merge <<: to factor out shared settings
@@ -560,7 +596,7 @@ generic_env_config:  &edxapp_generic_env
   FILE_UPLOAD_STORAGE_PREFIX: $EDXAPP_FILE_UPLOAD_STORAGE_PREFIX
   VIRTUAL_UNIVERSITIES: $EDXAPP_VIRTUAL_UNIVERSITIES
   SUBDOMAIN_BRANDING: $EDXAPP_SUBDOMAIN_BRANDING
-
+  REGISTRATION_EXTRA_FIELDS: $EDXAPP_REGISTRATION_EXTRA_FIELDS
 
 lms_auth_config:
   <<: *edxapp_generic_auth
@@ -570,7 +606,9 @@ lms_auth_config:
   EDX_API_KEY: $EDXAPP_EDX_API_KEY
   VERIFY_STUDENT: $EDXAPP_VERIFY_STUDENT
   GOOGLE_ANALYTICS_LINKEDIN: $EDXAPP_GOOGLE_ANALYTICS_LINKEDIN
+  CC_PROCESSOR_NAME: $EDXAPP_CC_PROCESSOR_NAME
   CC_PROCESSOR: $EDXAPP_CC_PROCESSOR
+
 lms_env_config:
   <<: *edxapp_generic_env
   PAID_COURSE_REGISTRATION_CURRENCY: $EDXAPP_PAID_COURSE_REGISTRATION_CURRENCY
@@ -619,9 +657,6 @@ edxapp_lms_gunicorn_host: 127.0.0.1
 service_variants_enabled:
   - lms
   - cms
-
-edxapp_lms_env: 'lms.envs.aws'
-edxapp_cms_env: 'cms.envs.aws'
 
 #Number of gunicorn worker processes to spawn, as a multiplier to number of virtual cores
 worker_core_mult:
