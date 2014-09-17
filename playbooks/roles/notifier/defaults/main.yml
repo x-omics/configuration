@@ -13,11 +13,20 @@ NOTIFIER_LOG_LEVEL: "INFO"
 NOTIFIER_RSYSLOG_ENABLED: "yes"
 NOTIFIER_DIGEST_TASK_INTERVAL: "1440"
 
+NOTIFIER_THEME_NAME: ""
+NOTIFIER_THEME_REPO: ""
+NOTIFIER_THEME_VERSION: "master"
+notifier_git_ssh:  "/tmp/notifier_git_ssh.sh"
+NOTIFIER_GIT_IDENTITY: !!null
+notifier_git_identity: "{{ NOTIFIER_HOME }}/notifier-git-identity"
+
 NOTIFIER_DIGEST_EMAIL_SENDER: "notifications@example.com"
 NOTIFIER_DIGEST_EMAIL_SUBJECT: "Daily Discussion Digest"
 NOTIFIER_DIGEST_EMAIL_TITLE: "Discussion Digest"
 NOTIFIER_DIGEST_EMAIL_DESCRIPTION: "A digest of unread content from course discussions you are following."
 NOTIFIER_EMAIL_SENDER_POSTAL_ADDRESS: ""
+
+NOTIFIER_ENV_EXTRA: {}
 
 NOTIFIER_LANGUAGE: ""
 

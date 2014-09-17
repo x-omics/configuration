@@ -52,6 +52,7 @@
   template:
     src=notifier_env.j2 dest={{ NOTIFIER_HOME }}/notifier_env
     owner="{{ NOTIFIER_USER }}" group="{{ NOTIFIER_USER }}"
+    mode=655
 
 - name: drop a bash_profile
   copy: >
@@ -84,6 +85,20 @@
 - name: create notifier/bin directory
   file:
     path="{{ NOTIFIER_HOME }}/bin" mode=2775 state=directory owner={{ NOTIFIER_USER }} group={{ NOTIFIER_USER }}
+
+- name: write supervisord wrapper for celery workers
+  template: >
+    src=notifier-celery-workers-supervisor.sh.j2
+    dest="{{ NOTIFIER_HOME }}/notifier-celery-workers-supervisor.sh"
+    mode=0775
+  sudo_user: "{{ NOTIFIER_USER }}"
+
+- name: write supervisord wrapper for scheduler
+  template: >
+    src=notifier-scheduler-supervisor.sh.j2
+    dest="{{ NOTIFIER_HOME }}/notifier-scheduler-supervisor.sh"
+    mode=0775
+  sudo_user: "{{ NOTIFIER_USER }}"
 
 - name: write supervisord config for celery workers
   template: >

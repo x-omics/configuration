@@ -15,7 +15,9 @@
 # Variables set to "None" will be converted to None
 # when the edxapp config is written to disk.
 
-
+# Bucket used for xblock file storage
+EDXAPP_XBLOCK_FS_STORAGE_BUCKET: 'xblock-storage-bucket'
+EDXAPP_XBLOCK_FS_STORAGE_PREFIX: 'xblock-storage-bucket-dir/'
 EDXAPP_LMS_BASE: ""
 EDXAPP_PREVIEW_LMS_BASE: ""
 EDXAPP_CMS_BASE: ""
@@ -113,7 +115,7 @@ EDXAPP_FEATURES:
   AUTH_USE_OPENID_PROVIDER: true
   CERTIFICATES_ENABLED: true
   ENABLE_DISCUSSION_SERVICE: true
-  ENABLE_INSTRUCTOR_ANALYTICS: true
+  ENABLE_INSTRUCTOR_ANALYTICS: false
   SUBDOMAIN_BRANDING: false
   SUBDOMAIN_COURSE_LISTINGS: false
   PREVIEW_LMS_BASE: "{{ EDXAPP_PREVIEW_LMS_BASE }}"
@@ -290,10 +292,10 @@ EDXAPP_FILE_UPLOAD_STORAGE_PREFIX: 'submissions_attachments'
 
 EDXAPP_CODE_JAIL_LIMITS:
   # Limit the memory of the jailed process to something high but not
-  # infinite (128MiB in bytes)
-  VMEM: 134217728
+  # infinite (512MiB in bytes)
+  VMEM: 536870912
   # Time in seconds that the jailed process has to run.
-  REALTIME: 1
+  REALTIME: 3
   # Needs to be non-zero so that jailed code can use it as their temp directory.(1MiB in bytes)
   FSIZE: 1048576
 
@@ -317,6 +319,30 @@ EDXAPP_REGISTRATION_EXTRA_FIELDS:
   honor_code: "required"
   city: "hidden"
   country: "hidden"
+
+EDXAPP_CELERY_WORKERS:
+  - queue: low
+    service_variant: cms
+    concurrency: 3
+  - queue: default
+    service_variant: cms
+    concurrency: 4
+  - queue: high
+    service_variant: cms
+    concurrency: 1
+  - queue: low
+    service_variant: lms
+    concurrency: 1
+  - queue: default
+    service_variant: lms
+    concurrency: 3
+  - queue: high
+    service_variant: lms
+    concurrency: 4
+  - queue: high_mem
+    service_variant: lms
+    concurrency: 2
+
 
 #-------- Everything below this line is internal to the role ------------
 
@@ -349,28 +375,7 @@ edxapp_git_ssh: "/tmp/edxapp_git_ssh.sh"
 # TODO: This can be removed once VPC-122 is resolved
 edxapp_legacy_course_data_dir: "{{ edxapp_app_dir }}/data"
 
-edxapp_workers:
-  - queue: low
-    service_variant: cms
-    concurrency: 3
-  - queue: default
-    service_variant: cms
-    concurrency: 4
-  - queue: high
-    service_variant: cms
-    concurrency: 1
-  - queue: low
-    service_variant: lms
-    concurrency: 1
-  - queue: default
-    service_variant: lms
-    concurrency: 3
-  - queue: high
-    service_variant: lms
-    concurrency: 4
-  - queue: high_mem
-    service_variant: lms
-    concurrency: 2
+edxapp_workers: "{{ EDXAPP_CELERY_WORKERS }}"
 
 # setup for python codejail
 edxapp_sandbox_venv_dir:  '{{ edxapp_venvs_dir }}/edxapp-sandbox'
@@ -508,6 +513,12 @@ edxapp_generic_auth_config:  &edxapp_generic_auth
   AWS_STORAGE_BUCKET_NAME: "{{ EDXAPP_AWS_STORAGE_BUCKET_NAME }}"
 
 generic_env_config:  &edxapp_generic_env
+  # TODO REMOVE the dashes version
+  # when https://github.com/edx/edx-platform/pull/5194/files is merged and released
+  XBLOCK-FS-STORAGE-BUCKET: $EDXAPP_XBLOCK_FS_STORAGE_BUCKET
+  XBLOCK-FS-STORAGE-PREFIX: $EDXAPP_XBLOCK_FS_STORAGE_PREFIX
+  XBLOCK_FS_STORAGE_BUCKET: $EDXAPP_XBLOCK_FS_STORAGE_BUCKET
+  XBLOCK_FS_STORAGE_PREFIX: $EDXAPP_XBLOCK_FS_STORAGE_PREFIX
   ANALYTICS_DATA_URL: $EDXAPP_ANALYTICS_DATA_URL
   CELERY_BROKER_VHOST: $EDXAPP_CELERY_BROKER_VHOST
   PAYMENT_SUPPORT_EMAIL: $EDXAPP_PAYMENT_SUPPORT_EMAIL
@@ -726,6 +737,8 @@ edxapp_debian_pkgs:
   # Needed by the CMS to manipulate images.
   - libjpeg8-dev
   - libpng12-dev
+  # matplotlib needs libfreetype6-dev
+  - libfreetype6-dev
 
 # Ruby Specific Vars
 edxapp_ruby_version: "1.9.3-p374"
