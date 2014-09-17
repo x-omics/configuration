@@ -60,7 +60,6 @@ edxapp_theme_version: 'HEAD'
 
 edx_platform_repo: "https://github.com/x-omics/edx-platform.git"
 
-discern_nltk_download_url: http://idefs.com/nltk-data-20131113.tar.gz
 
 CERTS_REPO: "https://github.com/x-omics/edx-certificates"
 CERTS_NGINX_PORT: 18090
@@ -70,4 +69,15 @@ CERTS_DOWNLOAD_URL: "http://x-omics.org:{{ CERTS_NGINX_PORT }}"
 CERTS_VERIFY_URL: "http://x-omics.org:{{ CERTS_NGINX_PORT }}"
 
 edx_ansible_source_repo: https://github.com/x-omics/configuration.git
+
+discern_nltk_download_url: ftp://ftp.bistu.edu.cn/OpenSource/nltk_data/nltk-data-20131113.tar.gz
+
+NLTK_DATA:
+  - { path: "taggers/maxent_treebank_pos_tagger",
+      url: "ftp://ftp.bistu.edu.cn/OpenSource/nltk_data/maxent_treebank_pos_tagger.zip" }
+  - { path: "corpora/stopwords",
+      url: "ftp://ftp.bistu.edu.cn/OpenSource/nltk_data/stopwords.zip" }
+  - { path: "corpora/wordnet",
+      url: "ftp://ftp.bistu.edu.cn/OpenSource/nltk_data/wordnet.zip" }
+
 
