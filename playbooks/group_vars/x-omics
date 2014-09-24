@@ -24,6 +24,8 @@ COMMON_TAG_EC2_INSTANCE: False
 MONGODB_REPO: "deb http://mirrors.bistu.edu.cn/mongodb/repo/ubuntu-upstart dist 10gen"
 
 
+EDXAPP_AWS_ACCESS_KEY_ID:  "YOUR_ID"
+EDXAPP_AWS_SECRET_ACCESS_KEY:  "YOUR_KEY"
 
 EDXAPP_LMS_BASE: 'www.x-omics.org'
 EDXAPP_PREVIEW_LMS_BASE: 'preview.x-omics.org'
