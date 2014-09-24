@@ -45,9 +45,5 @@
     - ora
     - certs
     - edx_ansible
-    - role: datadog
-      when: COMMON_ENABLE_DATADOG
-    - role: splunkforwarder
-      when: COMMON_ENABLE_SPLUNKFORWARDER
-    - role: newrelic
-      when: COMMON_ENABLE_NEWRELIC
+    - role: analytics-api
+      when: ANALYTICS_API_GIT_IDENTITY
