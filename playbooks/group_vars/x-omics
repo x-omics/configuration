@@ -71,6 +71,8 @@ CERTS_DOWNLOAD_URL: "http://x-omics.org:{{ CERTS_NGINX_PORT }}"
 CERTS_VERIFY_URL: "http://x-omics.org:{{ CERTS_NGINX_PORT }}"
 
 edx_ansible_source_repo: https://github.com/x-omics/configuration.git
+configuration_version: master
+
 
 discern_nltk_download_url: ftp://ftp.bistu.edu.cn/OpenSource/nltk_data/nltk-data-20131113.tar.gz
 
