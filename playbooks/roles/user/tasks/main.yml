@@ -111,14 +111,20 @@
 
 # authorized_keys2 used here so that personal
 # keys can be copied to authorized_keys
-# force is set to yes here, otherwise the keys
-# won't update if they haven't changed on the github
-# side
+# 2014/10/14 - using curl instead of get_url because
+# get_url was failing due to certificate verification errors
+
 - name: copy github key[s] to .ssh/authorized_keys2
-  get_url: >
-    url=https://github.com/{{ item.name }}.keys
-    force=yes
-    dest=/home/{{ item.name }}/.ssh/authorized_keys2 mode=0640
+  shell: >
+    curl https://github.com/{{ item.name }}.keys -o /home/{{ item.name }}/.ssh/authorized_keys2
+  sudo_user: "{{ item.name }}"
+  when: item.github is defined and item.get('state', 'present') == 'present'
+  with_items: user_info
+
+- name: set permissions on .ssh/authorized_keys2
+  file: >
+    dest=/home/{{ item.name }}/.ssh/authorized_keys2 
+    mode=0640
     owner={{ item.name }}
   when: item.github is defined and item.get('state', 'present') == 'present'
   with_items: user_info
