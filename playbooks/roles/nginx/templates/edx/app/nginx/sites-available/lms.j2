@@ -23,8 +23,8 @@ server {
 
   {% if NGINX_ENABLE_SSL %}
 
-  listen {{EDXAPP_LMS_NGINX_PORT}} {{default_site}};
-  listen {{EDXAPP_LMS_SSL_NGINX_PORT}} {{default_site}} ssl;
+  listen {{ EDXAPP_LMS_NGINX_PORT }} {{ default_site }};
+  listen {{ EDXAPP_LMS_SSL_NGINX_PORT }} {{ default_site }} ssl;
 
   ssl_certificate /etc/ssl/certs/{{ NGINX_SSL_CERTIFICATE|basename }};
   ssl_certificate_key /etc/ssl/private/{{ NGINX_SSL_KEY|basename }};
@@ -32,7 +32,7 @@ server {
   add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
 
   {% else %}
-  listen {{EDXAPP_LMS_NGINX_PORT}} {{default_site}};
+  listen {{ EDXAPP_LMS_NGINX_PORT }} {{ default_site }};
   {% endif %}
 
   access_log {{ nginx_log_dir }}/access.log {{ NGINX_LOG_FORMAT_NAME }};
@@ -75,6 +75,15 @@ server {
         deny all;
   }
   
+  # No basic auth for /segmentio/event
+  location /segmentio/event {
+    try_files $uri @proxy_to_lms_app;
+  }
+
+  location /notifier_api {
+    try_files $uri @proxy_to_lms_app;
+  }
+
   # No basic auth security on the github_service_hook url, so that github can use it for cms
   location /github_service_hook {
     try_files $uri @proxy_to_lms_app;
@@ -92,7 +101,7 @@ server {
 
   location /courses {
     {%- if EDXAPP_ENABLE_RATE_LIMITING -%}
-    # Set Limit  
+    # Set Limit
     limit_req zone=cookies burst={{ EDXAPP_COURSE_REQUEST_BURST_RATE }};
     error_page  503 = /server/rate-limit.html;
     {%- endif -%}

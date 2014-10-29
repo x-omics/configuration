@@ -22,12 +22,12 @@
     - datadog
 
 - name: add apt key
-  apt_key: id=C7A7DA52 url={{datadog_apt_key}} state=present
+  apt_key: id=C7A7DA52 url={{ COMMON_UBUNTU_APT_KEYSERVER }}{{ datadog_apt_key }} state=present
   tags:
     - datadog
 
 - name: install apt repository
-  apt_repository: repo='deb http://apt.datadoghq.com/ unstable main' update_cache=yes
+  apt_repository_1.8: repo='deb http://apt.datadoghq.com/ unstable main' update_cache=yes validate_certs=no
   tags:
     - datadog
 
